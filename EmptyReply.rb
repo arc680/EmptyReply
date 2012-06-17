@@ -8,7 +8,8 @@ Module.new do
       :name => 'こいつに空リプ',
       :condition => lambda{ |m| m.message.repliable? },
       :exec => lambda{ |m|
-        Post.primary_service.update(:message=> "@#{m.message.user.idname}")
+        Post.primary_service.update(:message=> "@#{m.message.user.idname}",
+                                    :replyto => m.message)
          },
       :visible => true,
       :role => :message }
