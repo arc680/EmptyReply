@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 # 空リプ
 
-Module.new do
-  Plugin.create(:EmptyReply).add_event_filter(:command){ |menu|
-    menu[:EmptyReply] = {
-      :slug => :EmptyReply,
-      :name => 'こいつに空リプ',
-      :condition => lambda{ |m| m.message.repliable? },
-      :exec => lambda{ |m|
-        Post.primary_service.update(:message=> "@#{m.message.user.idname}",
-                                    :replyto => m.message)
-         },
-      :visible => true,
-      :role => :message }
-    [menu]
-  }
+Plugin.create(:EmptyReply) do
+    command(:EmptyReply,
+            name: 'こいつに空リプ',
+            condition: Plugin::Command[:CanReplyAll],
+            visible: true,
+            role: :timeline) do |m|
+    m.messages.map do |msg|
+      str = "@#{msg.message.user.idname} "
+      Post.primary_service.update(:message => str,
+                                  :replyto => msg.message)
+    end
+  end
 end
